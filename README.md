@@ -15,6 +15,32 @@ docker run -itd --name ldaps --link directory:ldap \
     dweomer/stunnel
 ```
 
+### docker-compose.yml
+```
+version: "3"
+services:
+  stunnel:
+    image: 'dweomer/stunnel:latest'
+    container_name: stunnel-22
+    environment:
+      - STUNNEL_PROTOCOL=socks
+      - STUNNEL_SERVICE=socks_server
+      - STUNNEL_ACCEPT=9080
+      - STUNNEL_CONNECT=54.250.43.205:9081
+      - STUNNEL_KEY=/etc/stunnel/stunnel.key
+      - STUNNEL_CRT=/etc/stunnel/stunnel.pem
+      - STUNNEL_VERIFY_CHAIN=yes
+      - STUNNEL_CAFILE=/etc/stunnel/stunnel.pem
+    ports:
+      - "9080:9080"
+    volumes:
+      - /data/docker/stunnel/conf:/etc/stunnel
+      #- /etc/ssl/private/server.key:/etc/stunnel/stunnel.key:ro
+      #- /etc/ssl/private/server.crt:/etc/stunnel/stunnel.pem:ro
+
+```
+
+
 ### Copyright Notice
 >The [MIT License](LICENSE.txt) ([MIT](https://opensource.org/licenses/MIT))
 >

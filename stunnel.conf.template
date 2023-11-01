@@ -1,28 +1,47 @@
-cert = ${STUNNEL_CRT}
-key = ${STUNNEL_KEY}
-
 setuid = ${STUNNEL_UID}
 setgid = ${STUNNEL_GID}
-
-pid = /var/run/stunnel/stunnel.pid
 
 socket = l:TCP_NODELAY=1
 socket = r:TCP_NODELAY=1
 
-CAfile = ${STUNNEL_CAFILE}
-verifyChain = ${STUNNEL_VERIFY_CHAIN}
+foreground = yes
+pid = /var/run/stunnel/stunnel.pid
+output = /var/log/stunnel/stunnel.log
+debug = ${STUNNEL_DEBUG}
+
+; 每个握手都会生成一个新的ECDH密钥，提高了安全性，但也增加了计算开销
+options = SINGLE_ECDH_USE
+options = SINGLE_DH_USE
+; enable TLS 1.2 1.3
 sslVersionMin = TLSv1.2
 
-debug = ${STUNNEL_DEBUG}
-output = /var/log/stunnel/stunnel.log
-foreground = yes
-client = ${STUNNEL_CLIENT}
+; 优化,不插入空片段
+options = DONT_INSERT_EMPTY_FRAGMENTS
+; 禁用TLS协商
+renegotiation = no
+; SSL/TLS1.2 密码套件列表，用于加密和解密通信数据
+ciphers = ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256
+; SSL/TLS1.3 密码套件列表，用于加密和解密通信数据
+ciphersuites = TLS_CHACHA20_POLY1305_SHA256:TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256
 
 [${STUNNEL_SERVICE}]
-accept = ${STUNNEL_ACCEPT}
-connect = ${STUNNEL_CONNECT}
-delay = ${STUNNEL_DELAY}
-verify = ${STUNNEL_VERIFY}
 ${STUNNEL_PROTOCOL_CONFIG_LINE}
+client = ${STUNNEL_CLIENT}
+accept = ${STUNNEL_ACCEPT}
+${STUNNEL_CONNECT_CONFIG_LINE}
+
 ${STUNNEL_CIPHERS_CONFIG_LINE}
 ${STUNNEL_PSKSECRETS_CONFIG_LINE}
+
+cert = ${STUNNEL_CRT}
+key = ${STUNNEL_KEY}
+
+; 增加server端证书校验
+requireCert = ${STUNNEL_REQUIRE_CERT}
+CAfile = ${STUNNEL_CAFILE}
+
+delay = ${STUNNEL_DELAY}
+
+;This option is obsolete
+verify = ${STUNNEL_VERIFY}
+
